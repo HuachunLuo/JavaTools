@@ -1,8 +1,8 @@
 object frmMain: TfrmMain
-  Left = 741
-  Top = 146
-  Width = 893
-  Height = 794
+  Left = 464
+  Top = 326
+  Width = 664
+  Height = 415
   Caption = #20027#31383#20307
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
@@ -18,7 +18,7 @@ object frmMain: TfrmMain
   object Splitter1: TSplitter
     Left = 0
     Top = 41
-    Width = 877
+    Width = 648
     Height = 3
     Cursor = crVSplit
     Align = alTop
@@ -26,7 +26,7 @@ object frmMain: TfrmMain
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 877
+    Width = 648
     Height = 41
     Align = alTop
     BevelInner = bvRaised
@@ -48,7 +48,7 @@ object frmMain: TfrmMain
       Text = '127.0.0.1'
     end
     object Button1: TButton
-      Left = 768
+      Left = 448
       Top = 8
       Width = 75
       Height = 25
@@ -67,23 +67,23 @@ object frmMain: TfrmMain
     object edtDBName: TEdit
       Left = 208
       Top = 8
-      Width = 121
+      Width = 73
       Height = 27
       TabOrder = 3
       Text = 'Mytest'
     end
     object edtUserName: TEdit
-      Left = 352
+      Left = 288
       Top = 8
-      Width = 121
+      Width = 81
       Height = 27
       TabOrder = 4
       Text = 'sa'
     end
     object edtPassWord: TEdit
-      Left = 480
+      Left = 376
       Top = 8
-      Width = 89
+      Width = 65
       Height = 27
       TabOrder = 5
       Text = '1nihao'
@@ -91,8 +91,8 @@ object frmMain: TfrmMain
   end
   object sbStatus: TStatusBar
     Left = 0
-    Top = 736
-    Width = 877
+    Top = 357
+    Width = 648
     Height = 19
     Panels = <
       item
@@ -109,8 +109,8 @@ object frmMain: TfrmMain
   object Panel2: TPanel
     Left = 0
     Top = 44
-    Width = 877
-    Height = 692
+    Width = 648
+    Height = 313
     Align = alClient
     BevelInner = bvRaised
     BevelOuter = bvLowered
@@ -119,13 +119,13 @@ object frmMain: TfrmMain
     object Splitter2: TSplitter
       Left = 187
       Top = 2
-      Height = 688
+      Height = 309
     end
     object Panel3: TPanel
       Left = 2
       Top = 2
       Width = 185
-      Height = 688
+      Height = 309
       Align = alLeft
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -134,7 +134,7 @@ object frmMain: TfrmMain
         Left = 2
         Top = 2
         Width = 181
-        Height = 684
+        Height = 305
         Align = alClient
         ItemHeight = 19
         PopupMenu = PopupMenu1
@@ -144,8 +144,8 @@ object frmMain: TfrmMain
     object Panel4: TPanel
       Left = 190
       Top = 2
-      Width = 685
-      Height = 688
+      Width = 456
+      Height = 309
       Align = alClient
       BevelInner = bvRaised
       BevelOuter = bvLowered
@@ -153,8 +153,8 @@ object frmMain: TfrmMain
       object mmoContext: TMemo
         Left = 2
         Top = 2
-        Width = 681
-        Height = 684
+        Width = 452
+        Height = 305
         Align = alClient
         TabOrder = 0
       end

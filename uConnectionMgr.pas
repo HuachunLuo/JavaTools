@@ -1,3 +1,16 @@
+{*******************************************************}
+{                                                       }
+{       JavaMybatisTools                                }
+{                                                       }
+{       版权所有 (C) 2018 动力工作室                    }
+{
+
+开发需要用到 UniDAC控件.
+
+
+
+*******************************************************}
+
 unit uConnectionMgr;
 
 interface
@@ -49,6 +62,7 @@ begin
 end;
 
 function TConnectionMgr.conn(server: string; port: Integer; dbname, username, pwd: string): Boolean;
+//连接数据库
 begin
   try
     Result := True;
@@ -104,6 +118,7 @@ begin
 end;
 
 function TConnectionMgr.getMapperDelete(TableName: String): string;
+//生成@Delete语句
 var
   s_Sql: string;
   s, skey: string;
@@ -141,6 +156,7 @@ begin
 end;
 
 function TConnectionMgr.getMapperInsert(TableName: String): string;
+//生成@Insert语句
 var
   s_Sql: string;
   s, skey: string;
@@ -180,6 +196,7 @@ begin
 end;
 
 function TConnectionMgr.getMapperSelect(TableName: string): string;
+//生成MyBatis中的@Select语句
 var
   s_Sql: string;
   s, skey: string;
@@ -216,6 +233,7 @@ begin
 end;
 
 function TConnectionMgr.getMapperUpdate(TableName: String): string;
+//生成MyBatis中的@Update语句
 var
   s_Sql: string;
   s, skey: string;
@@ -256,6 +274,7 @@ begin
 end;
 
 function TConnectionMgr.getTables(isRefered: boolean = False): TStringList;
+//取得所有表的结构
 var
   s_Sql: string;
   s: string;
