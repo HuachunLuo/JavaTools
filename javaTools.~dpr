@@ -9,8 +9,7 @@ uses
   uMsg in 'uMsg.pas',
   uAbortForm in 'uAbortForm.pas' {frmAbort},
   SetupForm in 'SetupForm.pas' {frmSetup},
-  uConst in 'uConst.pas',
-  uTypeConvert in 'uTypeConvert.pas';
+  uConst in 'uConst.pas';
 
 {$R *.res}
 

@@ -34,7 +34,12 @@ type
     miInsert: TMenuItem;
     miUpdate: TMenuItem;
     miDelete: TMenuItem;
+    Panel5: TPanel;
+    cbUpperCase: TCheckBox;
+    N1: TMenuItem;
+    N2: TMenuItem;
     procedure Button1Click(Sender: TObject);
+    procedure cbUpperCaseClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure getEntityClick(Sender: TObject);
@@ -43,6 +48,7 @@ type
     procedure mirefresClick(Sender: TObject);
     procedure miSelectClick(Sender: TObject);
     procedure miUpdateClick(Sender: TObject);
+    procedure N2Click(Sender: TObject);
   private
     connMgr: TConnectionMgr;
     { Private declarations }
@@ -54,13 +60,17 @@ var
   frmMain: TfrmMain;
 
 implementation
+uses SetupForm;
 
 {$R *.dfm}
 
 procedure TfrmMain.Button1Click(Sender: TObject);
 begin
-  if not connMgr.isConnection then
-    connMgr.conn(edtServer.Text, StrToInt(edtPort.Text), edtDBName.Text, edtUserName.Text, edtPassWord.Text);
+  sbStatus.Panels[1].Text := '未连接';
+  lbTables.Items.Clear;
+  mmoContext.Lines.Clear;
+
+  connMgr.conn(edtServer.Text, StrToInt(edtPort.Text), edtDBName.Text, edtUserName.Text, edtPassWord.Text);
 
   if connMgr.isConnection then
   begin
@@ -69,6 +79,14 @@ begin
   end
   else
     sbStatus.Panels[1].Text := '未连接';
+end;
+
+procedure TfrmMain.cbUpperCaseClick(Sender: TObject);
+begin
+  if cbUpperCase.Checked then
+    mmoContext.Lines.CommaText := UpperCase(mmoContext.Lines.CommaText)
+  else
+    mmoContext.Lines.CommaText := LowerCase(mmoContext.Lines.CommaText)
 end;
 
 procedure TfrmMain.FormDestroy(Sender: TObject);
@@ -100,7 +118,8 @@ procedure TfrmMain.miDeleteClick(Sender: TObject);
 var
   tableName: string;
 begin
-  if lbTables.SelCount = 0 then    exit;
+  if lbTables.SelCount = 0 then
+    exit;
   tableName := lbTables.Items.Names[lbTables.itemindex];
   mmoContext.Text := connMgr.getMapperDelete(tableName);
 end;
@@ -109,7 +128,8 @@ procedure TfrmMain.miInsertClick(Sender: TObject);
 var
   tableName: string;
 begin
-  if lbTables.SelCount = 0 then    exit;
+  if lbTables.SelCount = 0 then
+    exit;
   tableName := lbTables.Items.Names[lbTables.itemindex];
   mmoContext.text := connMgr.getMapperInsert(tableName);
 end;
@@ -130,7 +150,8 @@ procedure TfrmMain.miSelectClick(Sender: TObject);
 var
   tableName: string;
 begin
-  if lbTables.SelCount = 0 then    exit;
+  if lbTables.SelCount = 0 then
+    exit;
   tableName := lbTables.Items.Names[lbTables.itemindex];
   mmoContext.text := connMgr.getMapperSelect(tableName);
 end;
@@ -139,9 +160,26 @@ procedure TfrmMain.miUpdateClick(Sender: TObject);
 var
   tableName: string;
 begin
-  if lbTables.SelCount = 0 then    exit;
+  if lbTables.SelCount = 0 then
+    exit;
   tableName := lbTables.Items.Names[lbTables.itemindex];
   mmoContext.text := connMgr.getMapperUpdate(tableName);
+end;
+
+procedure TfrmMain.N2Click(Sender: TObject);
+var
+  frmSetup: TFrmSetup;
+begin
+  frmSetup := TfrmSetup.Create(nil);
+  try
+    with frmSetup do
+    begin
+      ShowModal;
+    end;
+  finally
+    FreeAndNil(frmSetup);
+  end;
+
 end;
 
 end.

@@ -42,7 +42,7 @@ type
 implementation
 
 uses
-  uMsg;
+  uMsg,uTypeConvert;
 
 constructor TConnectionMgr.Create;
 begin
@@ -64,6 +64,8 @@ end;
 function TConnectionMgr.conn(server: string; port: Integer; dbname, username, pwd: string): Boolean;
 //连接数据库
 begin
+  Fconnection.Connected := False;
+  
   try
     Result := True;
     Fconnection.Server := server;
@@ -78,6 +80,7 @@ begin
     Fconnection.LoginPrompt := False;
     try
       Fconnection.Connected := True;
+      FTables.Clear;
     except
       result := False;
     end;
@@ -91,11 +94,34 @@ function TConnectionMgr.getEntity(TableName: string): string;
 var
   s_Sql: string;
   s: string;
+  mgr:TTypeConvertMgr;
+
+  function typeConvert(Atext:string):String;
+  begin
+    Result := '';
+    
+  end;
 begin
+  mgr := TTypeConvertMgr.Create;
+  try
   Result := '';
-  s_Sql := Format('SELECT ''private '' + aType +'' ''+ x.name + '';'' as S_Private FROM (' + #13#10 + 'SELECT a.name,' + #13#10 + '       CASE' + #13#10 + '     WHEN UPPER(b.name)=''CHAR'' THEN ''String''' + #13#10 + '     WHEN UPPER(b.name)=''varchar'' THEN ''String''' + #13#10 + '     WHEN UPPER(b.name)=''numeric'' THEN ''Float''' + #13#10 + '     WHEN UPPER(b.name)=''int'' THEN ''Integer''' + #13#10 + '     WHEN UPPER(b.name)=''date'' THEN ''Date''' + #13#10 + '     WHEN UPPER(b.name)=''datetime'' THEN ''Date''' + #13#10 + '     END AS aType' + #13#10 + '     FROM sys.columns a' + #13#10 + '  LEFT JOIN sys.types b ON a.system_type_id=b.system_type_id' + #13#10 + 'WHERE OBJECT_ID(%s)=a.OBJECT_ID' + #13#10 + ') x', [QuotedStr(TableName)]);
+  if mgr.DefineCount <> 0 then begin
+    s_Sql := Format('SELECT a.name,b.name as TypeName' + #13#10 +
+'     FROM sys.columns a' + #13#10 +
+'  LEFT JOIN sys.types b ON a.system_type_id=b.system_type_id' + #13#10 +
+'  WHERE OBJECT_ID(%s)=a.OBJECT_ID'
+,[QuotedStr(TableName)]);
+  end else
+    s_Sql := Format('SELECT ''private '' + aType +'' ''+ x.name + '';'' as S_Private FROM (' + #13#10 + 'SELECT a.name,' + #13#10 +
+    '       CASE' + #13#10 + '     WHEN UPPER(b.name)=''CHAR'' THEN ''String''' + #13#10 + '     WHEN UPPER(b.name)=''varchar'' THEN ''String''' + #13#10 +
+    '     WHEN UPPER(b.name)=''numeric'' THEN ''Float''' + #13#10 + '     WHEN UPPER(b.name)=''int'' THEN ''Integer''' + #13#10 +
+    '     WHEN UPPER(b.name)=''date'' THEN ''Date''' + #13#10 + '     WHEN UPPER(b.name)=''datetime'' THEN ''Date''' + #13#10 +
+    '     END AS aType' + #13#10 + '     FROM sys.columns a' + #13#10 + '  LEFT JOIN sys.types b ON a.system_type_id=b.system_type_id' + #13#10 +
+    ' WHERE OBJECT_ID(%s)=a.OBJECT_ID' + #13#10 + ') x', [QuotedStr(TableName)]);
+
   FQuery.Close;
   FQuery.SQL.Clear;
+  
   with TStringList.Create do
   begin
     with FQuery do
@@ -107,6 +133,9 @@ begin
       First;
       while not eof do
       begin
+        if mgr.DefineCount <> 0 then
+        s := Format('Private %s %s;',[Mgr.getValueByName(FieldByName('typename').AsString),LowerCase(FieldByName('name').AsString)])
+        else
         s := FieldByName('S_Private').AsString;
         Add(s);
         Next;
@@ -114,6 +143,9 @@ begin
     end;
     Result := CommaText;
     Free;
+  end;
+  finally
+      Mgr.free;
   end;
 end;
 
