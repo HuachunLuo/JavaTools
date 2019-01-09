@@ -1,6 +1,6 @@
 object frmSetup: TfrmSetup
-  Left = 770
-  Top = 111
+  Left = 632
+  Top = 206
   Width = 695
   Height = 515
   Caption = #35774#32622
@@ -20,7 +20,7 @@ object frmSetup: TfrmSetup
     Top = 0
     Width = 679
     Height = 476
-    ActivePage = TabSheet2
+    ActivePage = TabSheet1
     Align = alClient
     Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
@@ -93,7 +93,7 @@ object frmSetup: TfrmSetup
         Top = 8
         Width = 318
         Height = 12
-        Caption = #20363#31243':127.0.0.1:1433 mydbatabasename username password'
+        Caption = #20363#31243':127.0.0.1 1433 mydbatabasename username password'
       end
       object Label2: TLabel
         Left = 24

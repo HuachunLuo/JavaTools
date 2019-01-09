@@ -4,3 +4,6 @@
 *.~pas
 *.dcu
 *.ddp
+*.~dpr
+*.~dpr
+javaTools.~dpr

@@ -12,18 +12,12 @@ type
   TfrmMain = class(TForm)
     Panel1: TPanel;
     sbStatus: TStatusBar;
-    edtServer: TEdit;
-    Label1: TLabel;
     Button1: TButton;
     Splitter1: TSplitter;
     Panel2: TPanel;
     Panel3: TPanel;
     Splitter2: TSplitter;
     Panel4: TPanel;
-    edtPort: TEdit;
-    edtDBName: TEdit;
-    edtUserName: TEdit;
-    edtPassWord: TEdit;
     lbTables: TListBox;
     PopupMenu1: TPopupMenu;
     mmoContext: TMemo;
@@ -37,6 +31,7 @@ type
     cbUpperCase: TCheckBox;
     N1: TMenuItem;
     N2: TMenuItem;
+    cbbServers: TComboBox;
     procedure Button1Click(Sender: TObject);
     procedure cbUpperCaseClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -64,12 +59,17 @@ uses
 {$R *.dfm}
 
 procedure TfrmMain.Button1Click(Sender: TObject);
+var
+  sConnName:String;
 begin
-  sbStatus.Panels[1].Text := '未连接';
+    sbStatus.Panels[1].Text := '未连接';
   lbTables.Items.Clear;
   mmoContext.Lines.Clear;
-
-  ConnectionMgr.conn(edtServer.Text, StrToInt(edtPort.Text), edtDBName.Text, edtUserName.Text, edtPassWord.Text);
+  
+  
+  if  cbbServers.ItemIndex = -1 then   exit;
+  sConnName := cbbServers.Items[cbbServers.itemindex]; 
+  ConnectionMgr.conn(sConnName);
 
   if ConnectionMgr.isConnection then
   begin
@@ -93,6 +93,7 @@ end;
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   sbStatus.Panels[1].Text := '未连接';
+  cbbServers.Items.CommaText := ConnectionMgr.getConns;
 end;
 
 procedure TfrmMain.getEntityClick(Sender: TObject);

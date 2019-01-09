@@ -90,8 +90,8 @@ MaxStackSize=1048576
 ImageBase=4194304
 ExeDescription=
 [Directories]
-OutputDir=
-UnitOutputDir=
+OutputDir=bin
+UnitOutputDir=dcu
 PackageDLLOutputDir=
 PackageDCPOutputDir=
 SearchPath=
@@ -146,3 +146,12 @@ c:\program files (x86)\borland\delphi7\Bin\dcldss70.bpl=Borland Decision Cube Co
 c:\program files (x86)\borland\delphi7\Bin\dclclxdb70.bpl=Borland CLX Database Components
 C:\Program Files (x86)\Borland\Delphi7\Bin\dclclxstd70.bpl=Borland CLX Standard Components
 c:\program files (x86)\borland\delphi7\Bin\dclofficexp70.bpl=Microsoft Office XP Sample Automation Server Wrapper Components
+[HistoryLists\hlUnitAliases]
+Count=1
+Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
+[HistoryLists\hlUnitOutputDirectory]
+Count=1
+Item0=dcu
+[HistoryLists\hlOutputDirectorry]
+Count=1
+Item0=bin

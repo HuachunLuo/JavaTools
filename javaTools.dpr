@@ -14,7 +14,8 @@ uses
   uConfigMgr in 'uConfigMgr.pas',
   uMyToolsMgr in 'uMyToolsMgr.pas',
   uSystemMgr in 'uSystemMgr.pas',
-  uGlobal in 'uGlobal.pas';
+  uGlobal in 'uGlobal.pas',
+  uConnParamMgr in 'uConnParamMgr.pas';
 
 {$R *.res}
 

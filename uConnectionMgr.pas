@@ -28,12 +28,13 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    function conn(server: string; port: Integer; dbname, username, pwd: string): Boolean;
+    function conn(const ConnectionName: string): Boolean;
+    function getConns: string;
     function getEntity(TableName: string): string;
-    function getMapperDelete(TableName: String): string;
-    function getMapperInsert(TableName: String): string;
+    function getMapperDelete(TableName: string): string;
+    function getMapperInsert(TableName: string): string;
     function getMapperSelect(TableName: string): string;
-    function getMapperUpdate(TableName: String): string;
+    function getMapperUpdate(TableName: string): string;
     function getTables(isRefered: boolean = False): TStringList;
     property Connection: TuniConnection read Fconnection write Fconnection;
     property isConnection: Boolean read FisConnection write FisConnection;
@@ -42,7 +43,7 @@ type
 implementation
 
 uses
-  uMsg,uTypeConvert;
+  uMsg, uTypeConvert, IniFiles, uGlobal, uConnParamMgr;
 
 constructor TConnectionMgr.Create;
 begin
@@ -61,18 +62,22 @@ begin
   inherited;
 end;
 
-function TConnectionMgr.conn(server: string; port: Integer; dbname, username, pwd: string): Boolean;
+function TConnectionMgr.conn(const ConnectionName: string): Boolean;
 //连接数据库
+var
+  connParam: TConnectionParam;
 begin
   Fconnection.Connected := False;
-  
+
+
   try
+    connParam := ConnectionParamMgr.getConnParam(ConnectionName);
     Result := True;
-    Fconnection.Server := server;
-    Fconnection.Username := username;
-    Fconnection.Port := port;
-    Fconnection.Password := pwd;
-    Fconnection.Database := dbname;
+    Fconnection.Server := connParam.server;
+    Fconnection.Username := connParam.username;
+    Fconnection.Port := connParam.port;
+    Fconnection.Password := connParam.PassWord;
+    Fconnection.Database := connParam.dbname;
     Fconnection.SpecificOptions.Add('SQL Server.Direct=False');
     Fconnection.SpecificOptions.Add(Format('SQL Server.ConnectionTimeOut=%d', [5 * 1000]));
     Fconnection.SpecificOptions.Add('SQL Server.UseUniCode=true');
@@ -85,8 +90,22 @@ begin
       result := False;
     end;
   finally
+    FreeAndNil(connParam);
     FisConnection := Result;
   end;
+end;
+
+function TConnectionMgr.getConns: string;
+//取得所有连接
+var
+  ini: TIniFile;
+  Section: TStringList;
+begin
+  ini := Systemmgr.Env;
+  Section := TstringList.Create();
+  ini.ReadSection('DB', Section);
+  result := Section.CommaText;
+  Section.Free;
 end;
 
 function TConnectionMgr.getEntity(TableName: string): string;
@@ -94,74 +113,63 @@ function TConnectionMgr.getEntity(TableName: string): string;
 var
   s_Sql: string;
   s: string;
-  mgr:TTypeConvertMgr;
+  mgr: TTypeConvertMgr;
 
-  function typeConvert(Atext:string):String;
+  function typeConvert(Atext: string): string;
   begin
     Result := '';
-    
+
   end;
+
 begin
   mgr := TTypeConvertMgr.Create;
   try
-  Result := '';
-  if mgr.DefineCount <> 0 then begin
-    s_Sql := Format('SELECT a.name,b.name as TypeName' + #13#10 +
-'     FROM sys.columns a' + #13#10 +
-'  LEFT JOIN sys.types b ON a.system_type_id=b.system_type_id' + #13#10 +
-'  WHERE OBJECT_ID(%s)=a.OBJECT_ID'
-,[QuotedStr(TableName)]);
-  end else
-    s_Sql := Format('SELECT ''private '' + aType +'' ''+ x.name + '';'' as S_Private FROM (' + #13#10 + 'SELECT a.name,' + #13#10 +
-    '       CASE' + #13#10 + '     WHEN UPPER(b.name)=''CHAR'' THEN ''String''' + #13#10 + '     WHEN UPPER(b.name)=''varchar'' THEN ''String''' + #13#10 +
-    '     WHEN UPPER(b.name)=''numeric'' THEN ''Float''' + #13#10 + '     WHEN UPPER(b.name)=''int'' THEN ''Integer''' + #13#10 +
-    '     WHEN UPPER(b.name)=''date'' THEN ''Date''' + #13#10 + '     WHEN UPPER(b.name)=''datetime'' THEN ''Date''' + #13#10 +
-    '     END AS aType' + #13#10 + '     FROM sys.columns a' + #13#10 + '  LEFT JOIN sys.types b ON a.system_type_id=b.system_type_id' + #13#10 +
-    ' WHERE OBJECT_ID(%s)=a.OBJECT_ID' + #13#10 + ') x', [QuotedStr(TableName)]);
-
-  FQuery.Close;
-  FQuery.SQL.Clear;
-  
-  with TStringList.Create do
-  begin
-    with FQuery do
+    Result := '';
+    if mgr.DefineCount <> 0 then
     begin
-      close;
-      Sql.Clear;
-      Sql.Add(s_Sql);
-      Open;
-      First;
-      while not eof do
+      s_Sql := Format('SELECT a.name,b.name as TypeName' + #13#10 + '     FROM sys.columns a' + #13#10 + '  LEFT JOIN sys.types b ON a.system_type_id=b.system_type_id' + #13#10 + '  WHERE OBJECT_ID(%s)=a.OBJECT_ID', [QuotedStr(TableName)]);
+    end
+    else
+      s_Sql := Format('SELECT ''private '' + aType +'' ''+ x.name + '';'' as S_Private FROM (' + #13#10 + 'SELECT a.name,' + #13#10 + '       CASE' + #13#10 + '     WHEN UPPER(b.name)=''CHAR'' THEN ''String''' + #13#10 + '     WHEN UPPER(b.name)=''varchar'' THEN ''String''' + #13#10 + '     WHEN UPPER(b.name)=''numeric'' THEN ''Float''' + #13#10 + '     WHEN UPPER(b.name)=''int'' THEN ''Integer''' + #13#10 + '     WHEN UPPER(b.name)=''date'' THEN ''Date''' + #13#10 + '     WHEN UPPER(b.name)=''datetime'' THEN ''Date''' + #13#10 + '     END AS aType' + #13#10 + '     FROM sys.columns a' + #13#10 + '  LEFT JOIN sys.types b ON a.system_type_id=b.system_type_id' + #13#10 + ' WHERE OBJECT_ID(%s)=a.OBJECT_ID' + #13#10 + ') x', [QuotedStr(TableName)]);
+
+    FQuery.Close;
+    FQuery.SQL.Clear;
+
+    with TStringList.Create do
+    begin
+      with FQuery do
       begin
-        if mgr.DefineCount <> 0 then
-        s := Format('Private %s %s;',[Mgr.getValueByName(FieldByName('typename').AsString),LowerCase(FieldByName('name').AsString)])
-        else
-        s := FieldByName('S_Private').AsString;
-        Add(s);
-        Next;
+        close;
+        Sql.Clear;
+        Sql.Add(s_Sql);
+        Open;
+        First;
+        while not eof do
+        begin
+          if mgr.DefineCount <> 0 then
+            s := Format('Private %s %s;', [Mgr.getValueByName(FieldByName('typename').AsString), LowerCase(FieldByName('name').AsString)])
+          else
+            s := FieldByName('S_Private').AsString;
+          Add(s);
+          Next;
+        end;
       end;
+      Result := CommaText;
+      Free;
     end;
-    Result := CommaText;
-    Free;
-  end;
   finally
-      Mgr.free;
+    Mgr.free;
   end;
 end;
 
-function TConnectionMgr.getMapperDelete(TableName: String): string;
+function TConnectionMgr.getMapperDelete(TableName: string): string;
 //生成@Delete语句
 var
   s_Sql: string;
   s, skey: string;
 begin
   Result := '';
-  s_Sql := Format('SELECT  a.COLUMN_NAME  ,' + #13#10 +
-  '        b.COLUMN_NAME as keyName' + #13#10 +
-  'FROM    INFORMATION_SCHEMA.COLUMNS a' + #13#10 +
-  '        LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE b ON a.TABLE_CATALOG = b.TABLE_CATALOG' + #13#10 +
-  '                                                           AND b.TABLE_NAME = a.TABLE_NAME' + #13#10 +
-  ' WHERE   a.TABLE_NAME = %s', [QuotedStr(TableName)]);
+  s_Sql := Format('SELECT  a.COLUMN_NAME  ,' + #13#10 + '        b.COLUMN_NAME as keyName' + #13#10 + 'FROM    INFORMATION_SCHEMA.COLUMNS a' + #13#10 + '        LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE b ON a.TABLE_CATALOG = b.TABLE_CATALOG' + #13#10 + '                                                           AND b.TABLE_NAME = a.TABLE_NAME' + #13#10 + ' WHERE   a.TABLE_NAME = %s', [QuotedStr(TableName)]);
 
   FQuery.Close;
   FQuery.SQL.Clear;
@@ -187,7 +195,7 @@ begin
   end;
 end;
 
-function TConnectionMgr.getMapperInsert(TableName: String): string;
+function TConnectionMgr.getMapperInsert(TableName: string): string;
 //生成@Insert语句
 var
   s_Sql: string;
@@ -195,11 +203,7 @@ var
   list_name, list_value: TStringList;
 begin
   Result := '';
-  s_Sql := Format('SELECT  a.COLUMN_NAME  ,' + #13#10 +
-  '        b.COLUMN_NAME as keyName' + #13#10 + 'FROM    INFORMATION_SCHEMA.COLUMNS a' + #13#10 +
-  '        LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE b ON a.TABLE_CATALOG = b.TABLE_CATALOG' + #13#10 +
-  '                                                           AND b.TABLE_NAME = a.TABLE_NAME' + #13#10 +
-  ' WHERE   a.TABLE_NAME = %s', [QuotedStr(TableName)]);
+  s_Sql := Format('SELECT  a.COLUMN_NAME  ,' + #13#10 + '        b.COLUMN_NAME as keyName' + #13#10 + 'FROM    INFORMATION_SCHEMA.COLUMNS a' + #13#10 + '        LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE b ON a.TABLE_CATALOG = b.TABLE_CATALOG' + #13#10 + '                                                           AND b.TABLE_NAME = a.TABLE_NAME' + #13#10 + ' WHERE   a.TABLE_NAME = %s', [QuotedStr(TableName)]);
 
   FQuery.Close;
   FQuery.SQL.Clear;
@@ -216,11 +220,11 @@ begin
       while not eof do
       begin
         list_name.Add(FieldByName('column_name').AsString);
-        list_value.Add(Format('#{%s}',[FieldByName('column_name').AsString]));
+        list_value.Add(Format('#{%s}', [FieldByName('column_name').AsString]));
         Next;
       end;
     end;
-    Result := Format('INSERT INTO %s(%s) VALUES(%s)', [TableName,list_name.CommaText, list_value.CommaText]);
+    Result := Format('INSERT INTO %s(%s) VALUES(%s)', [TableName, list_name.CommaText, list_value.CommaText]);
   finally
     list_name.Free;
     list_value.Free
@@ -234,11 +238,7 @@ var
   s, skey: string;
 begin
   Result := '';
-  s_Sql := Format('SELECT  a.COLUMN_NAME  ,' + #13#10 +
-  '        b.COLUMN_NAME as keyName' + #13#10 + 'FROM    INFORMATION_SCHEMA.COLUMNS a' + #13#10 +
-  '        LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE b ON a.TABLE_CATALOG = b.TABLE_CATALOG' + #13#10 +
-  '                                                           AND b.TABLE_NAME = a.TABLE_NAME' + #13#10 +
-  ' WHERE   a.TABLE_NAME = %s', [QuotedStr(TableName)]);
+  s_Sql := Format('SELECT  a.COLUMN_NAME  ,' + #13#10 + '        b.COLUMN_NAME as keyName' + #13#10 + 'FROM    INFORMATION_SCHEMA.COLUMNS a' + #13#10 + '        LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE b ON a.TABLE_CATALOG = b.TABLE_CATALOG' + #13#10 + '                                                           AND b.TABLE_NAME = a.TABLE_NAME' + #13#10 + ' WHERE   a.TABLE_NAME = %s', [QuotedStr(TableName)]);
 
   FQuery.Close;
   FQuery.SQL.Clear;
@@ -264,7 +264,7 @@ begin
   end;
 end;
 
-function TConnectionMgr.getMapperUpdate(TableName: String): string;
+function TConnectionMgr.getMapperUpdate(TableName: string): string;
 //生成MyBatis中的@Update语句
 var
   s_Sql: string;
@@ -272,12 +272,7 @@ var
   list_name, list_value: TStringList;
 begin
   Result := '';
-  s_Sql := Format('SELECT  a.COLUMN_NAME  ,' + #13#10 +
-  '        b.COLUMN_NAME as keyName' + #13#10 +
-  'FROM    INFORMATION_SCHEMA.COLUMNS a' + #13#10 +
-  '        LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE b ON a.TABLE_CATALOG = b.TABLE_CATALOG' + #13#10 +
-  '                                                           AND b.TABLE_NAME = a.TABLE_NAME' + #13#10 +
-  ' WHERE   a.TABLE_NAME = %s', [QuotedStr(TableName)]);
+  s_Sql := Format('SELECT  a.COLUMN_NAME  ,' + #13#10 + '        b.COLUMN_NAME as keyName' + #13#10 + 'FROM    INFORMATION_SCHEMA.COLUMNS a' + #13#10 + '        LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE b ON a.TABLE_CATALOG = b.TABLE_CATALOG' + #13#10 + '                                                           AND b.TABLE_NAME = a.TABLE_NAME' + #13#10 + ' WHERE   a.TABLE_NAME = %s', [QuotedStr(TableName)]);
 
   FQuery.Close;
   FQuery.SQL.Clear;
@@ -293,12 +288,12 @@ begin
       First;
       while not eof do
       begin
-        list_name.Add(Format('%s=#{%s}',[FieldByName('column_name').AsString,FieldByName('column_name').AsString]));
+        list_name.Add(Format('%s=#{%s}', [FieldByName('column_name').AsString, FieldByName('column_name').AsString]));
         skey := FieldByName('keyName').AsString;
         Next;
       end;
     end;
-    Result := Format('Update %s Set %s Where %s=#{%s} ',[TableName,list_name.CommaText,skey,skey]);
+    Result := Format('Update %s Set %s Where %s=#{%s} ', [TableName, list_name.CommaText, skey, skey]);
   finally
     list_name.Free;
     list_value.Free

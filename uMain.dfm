@@ -31,61 +31,23 @@ object frmMain: TfrmMain
     BevelInner = bvRaised
     BevelOuter = bvLowered
     TabOrder = 0
-    object Label1: TLabel
-      Left = 13
-      Top = 11
-      Width = 12
-      Height = 12
-      Caption = 'DB'
-    end
-    object edtServer: TEdit
-      Left = 59
-      Top = 8
-      Width = 86
-      Height = 20
-      TabOrder = 0
-      Text = '127.0.0.1'
-    end
     object Button1: TButton
-      Left = 448
+      Left = 168
       Top = 8
       Width = 75
       Height = 25
       Caption = 'connect'
-      TabOrder = 1
+      TabOrder = 0
       OnClick = Button1Click
     end
-    object edtPort: TEdit
-      Left = 152
-      Top = 8
-      Width = 41
+    object cbbServers: TComboBox
+      Left = 10
+      Top = 10
+      Width = 145
       Height = 20
-      TabOrder = 2
-      Text = '1433'
-    end
-    object edtDBName: TEdit
-      Left = 208
-      Top = 8
-      Width = 73
-      Height = 20
-      TabOrder = 3
-      Text = 'Mytest'
-    end
-    object edtUserName: TEdit
-      Left = 288
-      Top = 8
-      Width = 81
-      Height = 20
-      TabOrder = 4
-      Text = 'sa'
-    end
-    object edtPassWord: TEdit
-      Left = 376
-      Top = 8
-      Width = 65
-      Height = 20
-      TabOrder = 5
-      Text = '1nihao'
+      Style = csDropDownList
+      ItemHeight = 12
+      TabOrder = 1
     end
   end
   object sbStatus: TStatusBar

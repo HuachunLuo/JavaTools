@@ -19,6 +19,7 @@ type
   end;
 
 implementation
+uses uGlobal;
 
 constructor TTypeConvertMgr.Create;
 begin
@@ -26,7 +27,7 @@ begin
   FList := TStringList.Create;
 
   FPath := ChangeFileExt(GetModuleName(0), '.ini');
-  FList.LoadFromFile(fpath);
+  FList.LoadFromFile(systemMgr.ConvertFile);
 
 
   
