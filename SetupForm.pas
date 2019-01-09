@@ -15,10 +15,22 @@ type
     Panel2: TPanel;
     btnSave: TButton;
     btninit: TButton;
+    TabSheet2: TTabSheet;
+    Panel4: TPanel;
+    edtConnectionString: TEdit;
+    lbConfigs: TListBox;
+    Label1: TLabel;
+    btnAdd: TButton;
+    edtConfigName: TEdit;
+    Label2: TLabel;
+    Label3: TLabel;
+    btnsaveConfig: TButton;
     procedure btninitClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure btnSaveClick(Sender: TObject);
+    procedure btnAddClick(Sender: TObject);
+    procedure lbConfigsDblClick(Sender: TObject);
   private
     Mgr: TTypeConvertMgr;
     { Private declarations }
@@ -63,6 +75,20 @@ end;
 procedure TfrmSetup.btnSaveClick(Sender: TObject);
 begin
   mgr.Save(mmoTypeConvert.Lines.CommaText);
+end;
+
+procedure TfrmSetup.btnAddClick(Sender: TObject);
+begin
+  lbConfigs.Items.Add(Format('%s=%s',[edtConfigName.Text,edtConnectionString.Text]));
+end;
+
+procedure TfrmSetup.lbConfigsDblClick(Sender: TObject);
+var
+  sName,sValue:String;
+begin
+  sName := lbConfigs.Items.Names[lbConfigs.ItemIndex];
+  edtConnectionString.text := lbConfigs.Items.Values[sName];
+  edtConfigName.Text := sName;
 end;
 
 end.

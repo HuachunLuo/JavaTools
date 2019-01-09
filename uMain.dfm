@@ -1,6 +1,6 @@
 object frmMain: TfrmMain
-  Left = 464
-  Top = 326
+  Left = 541
+  Top = 306
   Width = 663
   Height = 524
   Caption = 'JavaTools'
@@ -12,7 +12,6 @@ object frmMain: TfrmMain
   Font.Style = []
   OldCreateOrder = False
   OnCreate = FormCreate
-  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 12
   object Splitter1: TSplitter
@@ -190,10 +189,6 @@ object frmMain: TfrmMain
     end
     object N1: TMenuItem
       Caption = '-'
-    end
-    object mirefres: TMenuItem
-      Caption = #21047#26032
-      OnClick = mirefresClick
     end
     object getEntity: TMenuItem
       Caption = #21462#24471#23454#20307

@@ -10,7 +10,11 @@ uses
   uAbortForm in 'uAbortForm.pas' {frmAbort},
   SetupForm in 'SetupForm.pas' {frmSetup},
   uConst in 'uConst.pas',
-  uTypeConvert in 'uTypeConvert.pas';
+  uTypeConvert in 'uTypeConvert.pas',
+  uConfigMgr in 'uConfigMgr.pas',
+  uMyToolsMgr in 'uMyToolsMgr.pas',
+  uSystemMgr in 'uSystemMgr.pas',
+  uGlobal in 'uGlobal.pas';
 
 {$R *.res}
 

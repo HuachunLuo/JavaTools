@@ -24,7 +24,7 @@ constructor TTypeConvertMgr.Create;
 begin
   inherited;
   FList := TStringList.Create;
-  
+
   FPath := ChangeFileExt(GetModuleName(0), '.ini');
   FList.LoadFromFile(fpath);
 
