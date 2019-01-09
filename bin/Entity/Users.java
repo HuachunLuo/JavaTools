@@ -1,0 +1,1 @@
+package .entity;public class Users {"Private Integer id;","Private String code;","Private String username;","Private String passd;","Private String isexpire;","Private String flag;","Private Date createtime;","Private Date updatetime;"}

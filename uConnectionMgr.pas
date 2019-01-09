@@ -195,7 +195,15 @@ begin
   end;
 end;
 
+
 function TConnectionMgr.getMapperInsert(TableName: string): string;
+{-------------------------------------------------------------------------------
+  过程名:    TConnectionMgr.getMapperInsert
+  作者:      RO
+  日期:      2019.01.09
+  参数:      TableName: string
+  返回值:    生成mybatis @Insert 语句
+-------------------------------------------------------------------------------}
 //生成@Insert语句
 var
   s_Sql: string;

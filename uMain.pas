@@ -32,8 +32,19 @@ type
     N1: TMenuItem;
     N2: TMenuItem;
     cbbServers: TComboBox;
+    N3: TMenuItem;
+    CreateEntityFile1: TMenuItem;
+    CreateControllerFile1: TMenuItem;
+    CreateDaoFile1: TMenuItem;
+    CreateServiceFile1: TMenuItem;
+    CreateImplFile1: TMenuItem;
     procedure Button1Click(Sender: TObject);
     procedure cbUpperCaseClick(Sender: TObject);
+    procedure CreateControllerFile1Click(Sender: TObject);
+    procedure CreateDaoFile1Click(Sender: TObject);
+    procedure CreateEntityFile1Click(Sender: TObject);
+    procedure CreateImplFile1Click(Sender: TObject);
+    procedure CreateServiceFile1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure getEntityClick(Sender: TObject);
     procedure miDeleteClick(Sender: TObject);
@@ -65,7 +76,7 @@ begin
     sbStatus.Panels[1].Text := '未连接';
   lbTables.Items.Clear;
   mmoContext.Lines.Clear;
-  
+
   
   if  cbbServers.ItemIndex = -1 then   exit;
   sConnName := cbbServers.Items[cbbServers.itemindex]; 
@@ -90,10 +101,78 @@ begin
     mmoContext.Lines.CommaText := LowerCase(mmoContext.Lines.CommaText)
 end;
 
+procedure TfrmMain.CreateControllerFile1Click(Sender: TObject);
+var
+  tableName: string;
+begin
+  if lbTables.SelCount = 0 then
+    exit;
+  tableName := lbTables.Items[lbTables.itemindex];
+  mmoContext.Lines.Clear;
+  mmoContext.Lines.text := TableMgr.CreateController(tableName);
+
+end;
+
+procedure TfrmMain.CreateDaoFile1Click(Sender: TObject);
+var
+  tableName: string;
+begin
+  if lbTables.SelCount = 0 then
+    exit;
+  tableName := lbTables.Items[lbTables.itemindex];
+  mmoContext.Lines.Clear;
+  mmoContext.Lines.text := TableMgr.CreateDao(tableName);
+
+end;
+
+
+{-------------------------------------------------------------------------------
+  过程名:    TfrmMain.CreateEntityFile1Click
+  作者:      RO
+  日期:      2019.01.09
+  参数:      Sender: TObject
+  返回值:    创建实体文件
+-------------------------------------------------------------------------------}
+procedure TfrmMain.CreateEntityFile1Click(Sender: TObject);
+var
+  tableName: string;
+begin
+  if lbTables.SelCount = 0 then
+    exit;
+  tableName := lbTables.Items[lbTables.itemindex];
+  mmoContext.Lines.Clear;
+  mmoContext.Lines.text := TableMgr.CreateEntity(tableName);
+end;
+
+procedure TfrmMain.CreateImplFile1Click(Sender: TObject);
+var
+  tableName: string;
+begin
+  if lbTables.SelCount = 0 then
+    exit;
+  tableName := lbTables.Items[lbTables.itemindex];
+  mmoContext.Lines.Clear;
+  mmoContext.Lines.text := TableMgr.CreateImpl(tableName);
+
+end;
+
+procedure TfrmMain.CreateServiceFile1Click(Sender: TObject);
+var
+  tableName: string;
+begin
+  if lbTables.SelCount = 0 then
+    exit;
+  tableName := lbTables.Items[lbTables.itemindex];
+  mmoContext.Lines.Clear;
+  mmoContext.Lines.text := TableMgr.CreateService(tableName);
+
+end;
+
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   sbStatus.Panels[1].Text := '未连接';
   cbbServers.Items.CommaText := ConnectionMgr.getConns;
+  cbbServers.Itemindex := cbbServers.Items.IndexOf(systemMgr.getDefaultConnectionParamName);
 end;
 
 procedure TfrmMain.getEntityClick(Sender: TObject);

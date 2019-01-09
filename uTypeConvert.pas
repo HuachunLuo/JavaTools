@@ -82,7 +82,7 @@ end;
 procedure TTypeConvertMgr.Save(AText: string);
 begin
   FList.CommaText := AText;
-  FList.SaveToFile(fPath);
+  FList.SaveToFile(systemMgr.ConvertFile);
 end;
 
 end.

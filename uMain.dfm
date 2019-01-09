@@ -175,5 +175,28 @@ object frmMain: TfrmMain
       Caption = '@Delete'
       OnClick = miDeleteClick
     end
+    object N3: TMenuItem
+      Caption = '-'
+    end
+    object CreateEntityFile1: TMenuItem
+      Caption = 'Create Entity File'
+      OnClick = CreateEntityFile1Click
+    end
+    object CreateControllerFile1: TMenuItem
+      Caption = 'Create ControllerFile'
+      OnClick = CreateControllerFile1Click
+    end
+    object CreateDaoFile1: TMenuItem
+      Caption = 'Create Dao File'
+      OnClick = CreateDaoFile1Click
+    end
+    object CreateServiceFile1: TMenuItem
+      Caption = 'Create Service File'
+      OnClick = CreateServiceFile1Click
+    end
+    object CreateImplFile1: TMenuItem
+      Caption = 'Create Impl File'
+      OnClick = CreateImplFile1Click
+    end
   end
 end

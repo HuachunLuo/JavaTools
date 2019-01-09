@@ -57,6 +57,11 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    function CreateController(const TableName: string): string;
+    function CreateService(const TableName: string): string;
+    function CreateImpl(const TableName: string): string;
+    function CreateDao(const TableName: string): string;
+    function CreateEntity(const TableName: string): string;
     procedure FreeAll;
     function getEntity(TableName: string): string;
     function getMapperSelect(TableName: string): string;
@@ -84,6 +89,27 @@ begin
   inherited Destroy;
 end;
 
+function TTableMgr.CreateEntity(const TableName: string): string;
+{-------------------------------------------------------------------------------
+  过程名:    TTableMgr.CreateEntity
+  作者:      RO
+  日期:      2019.01.09
+  参数:      const TableName: string
+  返回值:    创建实体对象
+-------------------------------------------------------------------------------}
+var
+  s_entity: string;
+begin
+  s_entity := getEntity(TableName);
+  Result := Format('package %s.entity;public class %s {%s}', [systemMgr.packageName, TableName, s_entity]);
+  with TStringList.Create do
+  begin
+    Add(Result);
+    SaveToFile(Format('%s%s.java', [systemmgr.EntityPath, TableName]));
+    free;
+  end;
+end;
+
 procedure TTableMgr.FreeAll;
 var
   i: Integer;
@@ -108,24 +134,30 @@ begin
   if idx = -1 then
     exit;
   table := TTable(tables.Objects[idx]);
-  with TStringList.Create do
+
+  for i := 0 to Table.Columes.count - 1 do
   begin
-    for i := 0 to Table.Columes.count - 1 do
-    begin
-      Column := TColumn(Table.Columes.Objects[i]);
-      s := Format('Private %s %s;', [typeConvertMgr.getValueByName(Column.Atype), LowerCase(Column.FieldName)]);
-      Add(s);
-    end;
-    Result := CommaText;
-    Free;
+    Column := TColumn(Table.Columes.Objects[i]);
+    if i <> Table.Columes.count - 1 then
+      s := s + Format('Private %s %s;', [typeConvertMgr.getValueByName(Column.Atype), LowerCase(Column.FieldName)]) + ';'
+    else
+      s := s + Format('Private %s %s;', [typeConvertMgr.getValueByName(Column.Atype), LowerCase(Column.FieldName)]);
   end;
+  Result := s;
 end;
 
 function TTableMgr.getFieldkeyValue(TableName: string): string;
+{-------------------------------------------------------------------------------
+  过程名:    TTableMgr.getFieldkeyValue
+  作者:      RO
+  日期:      2019.01.09
+  参数:      TableName: string
+  返回值:    生成无注解@Results部分
+-------------------------------------------------------------------------------}
 var
   i: integer;
   idx: Integer;
-  sname, svalue: string;
+  sname: string;
   Table: TTable;
   Column: TColumn;
 begin
@@ -313,7 +345,7 @@ begin
           DefaultValue := FieldByName('DefaultValue').AsString;
           FieldDescript := FieldByName('FieldDescript').AsString;
           table.Columes.AddObject(FieldName, Column);
-        end;    
+        end;
         next;
       end;
     end;
@@ -339,6 +371,96 @@ begin
   end;
   FreeAndNil(FColumes);
   inherited Destroy;
+end;
+
+function TTableMgr.CreateController(const TableName: string): string;
+{-------------------------------------------------------------------------------
+  过程名:    TTableMgr.CreateController
+  作者:      RO
+  日期:      2019.01.09
+  参数:      const TableName: string
+  返回值:    创建Controller对象
+-------------------------------------------------------------------------------}
+var
+  s_package: string;
+begin
+  s_package := Format('package %s.controller;', [systemMgr.packageName]);
+
+  Result := Format('%s public class %1:sController {}', [s_package, TableName]);
+  with TStringList.Create do
+  begin
+    Add(Result);
+    SaveToFile(Format('%s%s.java', [systemmgr.controllerPath, TableName]));
+    free;
+  end;
+end;
+
+function TTableMgr.CreateDao(const TableName: string): string;
+{-------------------------------------------------------------------------------
+  过程名:    TTableMgr.CreateDao
+  作者:      RO
+  日期:      2019.01.09
+  参数:      const TableName: string
+  返回值:    创建Dao对象
+-------------------------------------------------------------------------------}
+var
+  s_package: string;
+begin
+  s_package := Format('package %s.dao;', [systemMgr.packageName]);
+
+  Result := Format('%0:s @Mapper public interface %1:sDao{%2:s %3:s %4:s %5:s};', [s_package, TableName, getMapperSelect(TableName), getMapperInsert(TableName), getMapperUpdate(TableName), getMapperDelete(TableName)]);
+  with TStringList.Create do
+  begin
+    Add(Result);
+    SaveToFile(Format('%s%s.java', [systemmgr.DaoPath, TableName]));
+    free;
+  end;
+end;
+
+function TTableMgr.CreateImpl(const TableName: string): string;
+
+{-------------------------------------------------------------------------------
+  过程名:    TTableMgr.CreateImpl
+  作者:      RO
+  日期:      2019.01.09
+  参数:      const TableName: string
+  返回值:    创建实现对象
+-------------------------------------------------------------------------------}
+var
+  s_package: string;
+begin
+  s_package := Format('package %s.Serviceimpl;', [systemMgr.packageName]);
+
+  Result := Format('%0:s @Service public class %1:sImpl implements %1:sService {}', [s_package, TableName]);
+  with TStringList.Create do
+  begin
+    Add(Result);
+    SaveToFile(Format('%s%s.java', [systemmgr.ImplPath, TableName]));
+    free;
+  end;
+
+end;
+
+function TTableMgr.CreateService(const TableName: string): string;
+{-------------------------------------------------------------------------------
+  过程名:    TTableMgr.CreateService
+  作者:      RO
+  日期:      2019.01.09
+  参数:      const TableName: string
+  返回值:    创建服务对象
+-------------------------------------------------------------------------------}
+var
+  s_package: string;
+begin
+  s_package := Format('package %s.Service;', [systemMgr.packageName]);
+
+  Result := Format('%0:s public interface %1:sService {}', [s_package, TableName]);
+  with TStringList.Create do
+  begin
+    Add(Result);
+    SaveToFile(Format('%s%s.java', [systemmgr.ServicePath, TableName]));
+    free;
+  end;
 end;
 
 end.
